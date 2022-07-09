@@ -10,16 +10,60 @@ namespace TwoDimensionGames
     /// true = Spieler 1, false = Spieler 2
     /// </summary>
     bool playerTurn = true;
+    byte[] player1Counts = new byte[8]; // 0 = FirstVerticalLine, 1 = SecondVerticalLine, 2 = ThirdVerticalLine, 3 = FirstHorizontalLine, 4 = SecondHorizontalLine, 5 = ThirdHorizontalLine, 6 = DigonalLeftTopToRightBottom, 7 = DigonalRightTopToLeftBottom
+    byte[] player2Counts = new byte[8]; // 0 = FirstVerticalLine, 1 = SecondVerticalLine, 2 = ThirdVerticalLine, 3 = FirstHorizontalLine, 4 = SecondHorizontalLine, 5 = ThirdHorizontalLine, 6 = DigonalLeftTopToRightBottom, 7 = DigonalRightTopToLeftBottom
     char player1Symbol = 'X';
     char player2Symbol = 'O';
-    char[,] map = { { ' ', '-', ' ', '-', ' ', '-', ' ' },
-                    { '|', ' ', '|', ' ', '|', ' ', '|' },
-                    { ' ', '-', ' ', '-', ' ', '-', ' ' },
-                    { '|', ' ', '|', ' ', '|', ' ', '|' },
-                    { ' ', '-', ' ', '-', ' ', '-', ' ' },
-                    { '|', ' ', '|', ' ', '|', ' ', '|' },
-                    { ' ', '-', ' ', '-', ' ', '-', ' ' },};
+    private char [,] blankMap = { { ' ', '-', ' ', '-', ' ', '-', ' ' },
+                                  { '|', ' ', '|', ' ', '|', ' ', '|' },
+                                  { ' ', '-', ' ', '-', ' ', '-', ' ' },
+                                  { '|', ' ', '|', ' ', '|', ' ', '|' },
+                                  { ' ', '-', ' ', '-', ' ', '-', ' ' },
+                                  { '|', ' ', '|', ' ', '|', ' ', '|' },
+                                  { ' ', '-', ' ', '-', ' ', '-', ' ' },};
+    private char[,] currentMap = { { ' ', '-', ' ', '-', ' ', '-', ' ' },
+                                   { '|', ' ', '|', ' ', '|', ' ', '|' },
+                                   { ' ', '-', ' ', '-', ' ', '-', ' ' },
+                                   { '|', ' ', '|', ' ', '|', ' ', '|' },
+                                   { ' ', '-', ' ', '-', ' ', '-', ' ' },
+                                   { '|', ' ', '|', ' ', '|', ' ', '|' },
+                                   { ' ', '-', ' ', '-', ' ', '-', ' ' },};
+    List<ConsoleKey> pressedKeys = new List<ConsoleKey>();
     internal void Start()
+    {
+      ConsoleKeyInfo userInput;
+      while (true)
+      {
+        PlayGame();
+        while (true)
+        {
+          Console.WriteLine("Drücken Sie [Enter] wenn sie nochmal spielen wollen oder [Esc], falls sie das Spiel beenden wollen.");
+          userInput = Console.ReadKey();
+          if (userInput.Key == ConsoleKey.Enter)
+          {
+            RefreshGame();
+          }
+          else if (userInput.Key == ConsoleKey.Escape)
+          {
+            return;
+          }
+          else
+          {
+            Console.Clear();
+          }
+        }
+      } 
+    }
+
+    private void RefreshGame()
+    {
+      playerTurn = true;
+      player1Counts = new byte[8];
+      player2Counts = new byte[8];
+      currentMap = blankMap;
+    }
+
+    private void PlayGame()
     {
       while (true)
       {
@@ -49,7 +93,7 @@ namespace TwoDimensionGames
       {
         for (int j = 1; j <= 5; j += 2)
         {
-          if (map[i, j] != ' ')
+          if (currentMap[i, j] != ' ')
             notEmptyFields++;
         }
       }
@@ -84,9 +128,7 @@ namespace TwoDimensionGames
       }
       return ret;
     }
-    byte[] player1Counts = {0, 0, 0, 0, 0, 0, 0, 0}; // 0 = FirstVerticalLine, 1 = SecondVerticalLine, 2 = ThirdVerticalLine, 3 = FirstHorizontalLine, 4 = SecondHorizontalLine, 5 = ThirdHorizontalLine, 6 = DigonalLeftTopToRightBottom, 7 = DigonalRightTopToLeftBottom
-    byte[] player2Counts = {0, 0, 0, 0, 0, 0, 0, 0}; // 0 = FirstVerticalLine, 1 = SecondVerticalLine, 2 = ThirdVerticalLine, 3 = FirstHorizontalLine, 4 = SecondHorizontalLine, 5 = ThirdHorizontalLine, 6 = DigonalLeftTopToRightBottom, 7 = DigonalRightTopToLeftBottom
-    List<ConsoleKey> pressedKeys = new List<ConsoleKey>();
+
     private void SetSymbol(ConsoleKeyInfo userInput)
     {
       byte[] playerCount = new byte[5];
@@ -105,33 +147,33 @@ namespace TwoDimensionGames
       {
         if (userInput.Key == ConsoleKey.Q || userInput.Key == ConsoleKey.NumPad7)
         {
-          map[1, 1] = turnSymbol;
+          currentMap[1, 1] = turnSymbol;
           playerCount[0]++;
           playerCount[3]++;
           playerCount[6]++;
         }
         else if (userInput.Key == ConsoleKey.W || userInput.Key == ConsoleKey.NumPad8)
         {
-          map[1, 3] = turnSymbol;
+          currentMap[1, 3] = turnSymbol;
           playerCount[1]++;
           playerCount[3]++;
         }
         else if (userInput.Key == ConsoleKey.E || userInput.Key == ConsoleKey.NumPad9)
         {
-          map[1, 5] = turnSymbol;
+          currentMap[1, 5] = turnSymbol;
           playerCount[2]++;
           playerCount[3]++;
           playerCount[7]++;
         }
         else if (userInput.Key == ConsoleKey.A || userInput.Key == ConsoleKey.NumPad4)
         {
-          map[3, 1] = turnSymbol;
+          currentMap[3, 1] = turnSymbol;
           playerCount[0]++;
           playerCount[4]++;
         }
         else if (userInput.Key == ConsoleKey.S || userInput.Key == ConsoleKey.NumPad5)
         {
-          map[3, 3] = turnSymbol;
+          currentMap[3, 3] = turnSymbol;
           playerCount[1]++;
           playerCount[4]++;
           playerCount[6]++;
@@ -139,26 +181,26 @@ namespace TwoDimensionGames
         }
         else if (userInput.Key == ConsoleKey.D || userInput.Key == ConsoleKey.NumPad6)
         {
-          map[3, 5] = turnSymbol;
+          currentMap[3, 5] = turnSymbol;
           playerCount[2]++;
           playerCount[4]++;
         }
         else if (userInput.Key == ConsoleKey.Y || userInput.Key == ConsoleKey.NumPad1)
         {
-          map[5, 1] = turnSymbol;
+          currentMap[5, 1] = turnSymbol;
           playerCount[0]++;
           playerCount[5]++;
           playerCount[7]++;
         }
         else if (userInput.Key == ConsoleKey.X || userInput.Key == ConsoleKey.NumPad2)
         {
-          map[5, 3] = turnSymbol;
+          currentMap[5, 3] = turnSymbol;
           playerCount[1]++;
           playerCount[5]++;
         }
         else if (userInput.Key == ConsoleKey.C || userInput.Key == ConsoleKey.NumPad3)
         {
-          map[5, 5] = turnSymbol;
+          currentMap[5, 5] = turnSymbol;
           playerCount[2]++;
           playerCount[5]++;
           playerCount[6]++;
@@ -184,7 +226,7 @@ namespace TwoDimensionGames
       {
         for (byte j = 0; j < 7; j++)
         {
-          Console.Write(map[i,j]);
+          Console.Write(currentMap[i,j]);
         }
         Console.WriteLine();
       }
